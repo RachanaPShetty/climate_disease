@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Climate & Disease Intelligence · Sahyadri</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#070b14;
+  --bg2:#0d1220;
+  --card:#0f1829;
+  --card2:#131e30;
+  --border:#1c2d45;
+  --border2:#243548;
+  --g1:#00ffa3;
+  --g2:#00d4ff;
+  --r1:#ff4d6d;
+  --y1:#ffbe0b;
+  --p1:#7c5cbf;
+  --text:#dde8f5;
+  --muted:#5a7494;
+  --muted2:#3d5068;
+  --font-head:'Playfair Display',serif;
+  --font-body:'Space Grotesk',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+}
+
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;overflow-x:hidden}
+
+/* Animated mesh background */
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 10%,rgba(0,255,163,0.04) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%,rgba(0,212,255,0.04) 0%,transparent 60%),
+    radial-gradient(ellipse 40% 60% at 50% 50%,rgba(124,92,191,0.03) 0%,transparent 70%);
+  pointer-events:none;z-index:0;
+}
+
+/* Grid overlay */
+body::after{
+  content:'';position:fixed;inset:0;
+  background-image:linear-gradient(rgba(0,255,163,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,163,0.025) 1px,transparent 1px);
+  background-size:48px 48px;
+  pointer-events:none;z-index:0;
+}
+
+.wrapper{position:relative;z-index:1;max-width:1440px;margin:0 auto;padding:0 32px 80px}
+
+/* ── NAV ── */
+nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 0;border-bottom:1px solid var(--border);
+  margin-bottom:0;position:sticky;top:0;
+  background:rgba(7,11,20,0.92);backdrop-filter:blur(20px);
+  z-index:100;
+}
+.nav-logo{font-family:var(--font-mono);font-size:12px;color:var(--g1);letter-spacing:3px;text-transform:uppercase}
+.nav-links{display:flex;gap:4px}
+.nav-link{
+  font-family:var(--font-mono);font-size:11px;color:var(--muted);
+  text-decoration:none;padding:6px 14px;border-radius:6px;
+  border:1px solid transparent;letter-spacing:1px;
+  transition:all 0.2s;cursor:pointer;
+}
+.nav-link:hover,.nav-link.active{color:var(--g1);border-color:rgba(0,255,163,0.2);background:rgba(0,255,163,0.05)}
+
+/* ── HERO ── */
+.hero{padding:60px 0 48px;border-bottom:1px solid var(--border)}
+.hero-tag{
+  font-family:var(--font-mono);font-size:11px;color:var(--g1);
+  letter-spacing:4px;text-transform:uppercase;
+  display:flex;align-items:center;gap:10px;margin-bottom:20px;
+}
+.hero-tag span{width:32px;height:1px;background:var(--g1);display:inline-block}
+.hero h1{
+  font-family:var(--font-head);
+  font-size:clamp(28px,4.5vw,54px);
+  line-height:1.1;
+  color:var(--text);
+  max-width:750px;
+  margin-bottom:16px;
+}
+.hero h1 em{font-style:italic;color:var(--g1)}
+.hero-sub{font-size:14px;color:var(--muted);font-family:var(--font-mono);margin-bottom:40px}
+
+/* ── STAT CARDS ── */
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:48px}
+.stat{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;padding:22px 20px;position:relative;overflow:hidden;
+  transition:border-color 0.3s,transform 0.3s;
+}
+.stat:hover{border-color:var(--border2);transform:translateY(-3px)}
+.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.stat.s1::before{background:linear-gradient(90deg,var(--g1),var(--g2))}
+.stat.s2::before{background:linear-gradient(90deg,var(--g2),var(--p1))}
+.stat.s3::before{background:linear-gradient(90deg,var(--y1),var(--r1))}
+.stat.s4::before{background:linear-gradient(90deg,var(--r1),var(--p1))}
+.stat.s5::before{background:linear-gradient(90deg,var(--p1),var(--g1))}
+.stat-label{font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
+.stat-val{font-family:var(--font-head);font-size:34px;line-height:1;margin-bottom:4px}
+.stat.s1 .stat-val{color:var(--g1)}
+.stat.s2 .stat-val{color:var(--g2)}
+.stat.s3 .stat-val{color:var(--y1)}
+.stat.s4 .stat-val{color:var(--r1)}
+.stat.s5 .stat-val{color:var(--p1)}
+.stat-desc{font-size:11px;color:var(--muted)}
+
+/* ── SECTION TITLES ── */
+.section{margin-bottom:48px}
+.section-head{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+.section-num{font-family:var(--font-mono);font-size:11px;color:var(--g1);letter-spacing:2px}
+.section-title{font-family:var(--font-head);font-size:22px;color:var(--text)}
+.section-line{flex:1;height:1px;background:var(--border)}
+
+/* ── GRID LAYOUTS ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.grid-1{display:grid;grid-template-columns:1fr;gap:16px}
+.span-2{grid-column:span 2}
+
+/* ── CHART CARD ── */
+.card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:24px;
+  transition:border-color 0.3s,transform 0.3s;
+}
+.card:hover{border-color:rgba(0,255,163,0.15);transform:translateY(-2px)}
+.card-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:12px}
+.card-title{font-size:14px;font-weight:700;color:var(--text);letter-spacing:0.3px}
+.card-sub{font-size:11px;color:var(--muted);margin-top:4px;font-family:var(--font-mono)}
+.badge{
+  font-family:var(--font-mono);font-size:10px;padding:4px 12px;
+  border-radius:20px;white-space:nowrap;flex-shrink:0;letter-spacing:1px;
+}
+.badge-g{background:rgba(0,255,163,0.1);color:var(--g1);border:1px solid rgba(0,255,163,0.25)}
+.badge-b{background:rgba(0,212,255,0.1);color:var(--g2);border:1px solid rgba(0,212,255,0.25)}
+.badge-r{background:rgba(255,77,109,0.1);color:var(--r1);border:1px solid rgba(255,77,109,0.25)}
+.badge-y{background:rgba(255,190,11,0.1);color:var(--y1);border:1px solid rgba(255,190,11,0.25)}
+.badge-p{background:rgba(124,92,191,0.1);color:var(--p1);border:1px solid rgba(124,92,191,0.25)}
+
+/* ── MODEL RESULTS ── */
+.model-row{display:flex;flex-direction:column;gap:16px}
+.model-item{
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:12px;padding:18px 20px;
+  display:flex;align-items:center;gap:20px;
+  transition:border-color 0.3s;
+}
+.model-item.winner{border-color:rgba(0,255,163,0.3);background:rgba(0,255,163,0.04)}
+.model-name{font-weight:700;font-size:14px;min-width:160px}
+.model-item.winner .model-name{color:var(--g1)}
+.model-metrics{display:flex;gap:32px;flex:1}
+.metric-box{display:flex;flex-direction:column;gap:3px}
+.metric-label{font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:1px}
+.metric-val{font-family:var(--font-mono);font-size:18px;font-weight:500}
+.metric-val.green{color:var(--g1)}
+.metric-val.blue{color:var(--g2)}
+.metric-val.yellow{color:var(--y1)}
+.model-bar-wrap{flex:1;max-width:200px}
+.model-bar-bg{height:8px;background:var(--border);border-radius:999px;overflow:hidden}
+.model-bar{height:100%;border-radius:999px;transition:width 1.2s cubic-bezier(0.4,0,0.2,1)}
+.crown{font-size:18px;margin-left:auto}
+
+/* ── FEATURE IMPORTANCE ── */
+.feat-list{display:flex;flex-direction:column;gap:14px}
+.feat-item{display:flex;flex-direction:column;gap:6px}
+.feat-top{display:flex;justify-content:space-between;align-items:center}
+.feat-name{font-size:13px;font-weight:600;color:var(--text)}
+.feat-pct{font-family:var(--font-mono);font-size:12px}
+.feat-bg{height:8px;background:var(--border);border-radius:999px;overflow:hidden}
+.feat-fill{height:100%;border-radius:999px}
+
+/* ── PCA TABLE ── */
+.pca-table{width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:12px}
+.pca-table th{color:var(--muted);font-weight:500;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);letter-spacing:1px;text-transform:uppercase;font-size:10px}
+.pca-table td{padding:12px 14px;border-bottom:1px solid rgba(28,45,69,0.5);color:var(--text)}
+.pca-table tr:last-child td{border-bottom:none}
+.pca-table tr:hover td{background:rgba(0,255,163,0.03)}
+.pca-highlight{color:var(--g1);font-weight:500}
+
+/* ── LAG TABLE ── */
+.lag-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:8px}
+.lag-cell{
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:10px;padding:14px;text-align:center;
+}
+.lag-cell.best{border-color:rgba(0,255,163,0.4);background:rgba(0,255,163,0.07)}
+.lag-month{font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-bottom:6px;letter-spacing:1px}
+.lag-val{font-family:var(--font-mono);font-size:16px;font-weight:500}
+.lag-cell.best .lag-val{color:var(--g1)}
+
+/* ── SCENARIO TABLE ── */
+.scenario-table{width:100%;border-collapse:collapse}
+.scenario-table th{font-family:var(--font-mono);font-size:10px;color:var(--muted);padding:10px 16px;text-align:left;border-bottom:1px solid var(--border);letter-spacing:2px;text-transform:uppercase}
+.scenario-table td{padding:14px 16px;border-bottom:1px solid rgba(28,45,69,0.5);font-size:13px}
+.scenario-table tr:last-child td{border-bottom:none}
+.scenario-table tr:hover td{background:rgba(255,255,255,0.02)}
+.risk{font-family:var(--font-mono);font-size:11px;padding:4px 12px;border-radius:20px;font-weight:500}
+.risk-low{background:rgba(0,255,163,0.1);color:var(--g1);border:1px solid rgba(0,255,163,0.25)}
+.risk-mod{background:rgba(255,190,11,0.1);color:var(--y1);border:1px solid rgba(255,190,11,0.25)}
+.risk-high{background:rgba(255,77,109,0.1);color:var(--r1);border:1px solid rgba(255,77,109,0.25)}
+.risk-vhigh{background:rgba(255,77,109,0.2);color:#ff1a1a;border:1px solid rgba(255,20,20,0.4)}
+.cases-num{font-family:var(--font-mono);font-weight:500;color:var(--g2)}
+
+/* ── FINDING CARDS ── */
+.findings-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.finding{
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:12px;padding:20px;
+  border-left:3px solid var(--g1);
+}
+.finding.r{border-left-color:var(--r1)}
+.finding.y{border-left-color:var(--y1)}
+.finding-icon{font-size:22px;margin-bottom:10px}
+.finding-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px}
+.finding-text{font-size:12px;color:var(--muted);line-height:1.6}
+.finding-text b{color:var(--g1)}
+.finding.r .finding-text b{color:var(--r1)}
+.finding.y .finding-text b{color:var(--y1)}
+
+/* ── FOOTER ── */
+footer{
+  border-top:1px solid var(--border);padding:32px 0;
+  display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:12px;
+}
+footer p{font-family:var(--font-mono);font-size:11px;color:var(--muted);line-height:1.8}
+.footer-accent{color:var(--g1)}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp 0.6s ease forwards;opacity:0}
+.fade-up:nth-child(1){animation-delay:0.05s}
+.fade-up:nth-child(2){animation-delay:0.1s}
+.fade-up:nth-child(3){animation-delay:0.15s}
+.fade-up:nth-child(4){animation-delay:0.2s}
+.fade-up:nth-child(5){animation-delay:0.25s}
+
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+.pulse{animation:pulse 2s ease-in-out infinite}
+
+/* scrollbar */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">⬡ CLIMATE · DISEASE · ML</div>
+  <div class="nav-links">
+    <a class="nav-link active" href="#overview">Overview</a>
+    <a class="nav-link" href="#climate">Climate</a>
+    <a class="nav-link" href="#disease">Disease</a>
+    <a class="nav-link" href="#correlation">Correlation</a>
+    <a class="nav-link" href="#pca">PCA</a>
+    <a class="nav-link" href="#models">Models</a>
+    <a class="nav-link" href="#arima">ARIMA</a>
+    <a class="nav-link" href="#scenarios">Scenarios</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero" id="overview">
+  <div class="hero-tag"><span></span>VTU Major Project · Team 15 · 2025–26</div>
+  <h1>A <em>Multidimensional</em> Machine Learning Framework for Quantifying the Impact of Climatic Variability on <em>General Disease Dynamics</em></h1>
+  <div class="hero-sub">Sahyadri College of Engineering & Management, Mangaluru &nbsp;·&nbsp; Dept. of CSE &nbsp;·&nbsp; Guide: Dr. Mustafa Basthikodi</div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat s1 fade-up">
+      <div class="stat-label">Years Covered</div>
+      <div class="stat-val">14</div>
+      <div class="stat-desc">2010 – 2023</div>
+    </div>
+    <div class="stat s2 fade-up">
+      <div class="stat-label">Total Records</div>
+      <div class="stat-val">168</div>
+      <div class="stat-desc">Monthly observations</div>
+    </div>
+    <div class="stat s3 fade-up">
+      <div class="stat-label">Best Model R²</div>
+      <div class="stat-val">0.992</div>
+      <div class="stat-desc">Random Forest</div>
+    </div>
+    <div class="stat s4 fade-up">
+      <div class="stat-label">Total Dengue Cases</div>
+      <div class="stat-val">16.2K</div>
+      <div class="stat-desc">2010–2023 cumulative</div>
+    </div>
+    <div class="stat s5 fade-up">
+      <div class="stat-label">PCA Components</div>
+      <div class="stat-val">5</div>
+      <div class="stat-desc">Explain 95%+ variance</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 1: CLIMATE TRENDS             -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section" id="climate" style="margin-top:48px">
+  <div class="section-head">
+    <div class="section-num">01</div>
+    <div class="section-title">Climate Trends — Bangalore 2010–2023</div>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Temperature & Humidity Over Time</div>
+          <div class="card-sub">Monthly averages · dual axis</div>
+        </div>
+        <span class="badge badge-b">Dual Axis</span>
+      </div>
+      <canvas id="tempChart" height="200"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Monthly Rainfall Pattern</div>
+          <div class="card-sub">Monsoon season clearly visible Jun–Sep</div>
+        </div>
+        <span class="badge badge-p">Seasonal</span>
+      </div>
+      <canvas id="rainfallChart" height="200"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 2: DISEASE TRENDS             -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section" id="disease">
+  <div class="section-head">
+    <div class="section-num">02</div>
+    <div class="section-title">Disease Trends — Dengue · Malaria · Cholera</div>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="grid-1">
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Disease Cases Over Time (2010–2023)</div>
+          <div class="card-sub">Post-monsoon spikes clearly visible in Dengue & Malaria</div>
+        </div>
+        <span class="badge badge-r">3 Diseases</span>
+      </div>
+      <canvas id="diseaseChart" height="140"></canvas>
+    </div>
+  </div>
+
+  <div class="grid-3" style="margin-top:16px">
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Dengue — Seasonal Average</div><div class="card-sub">Peak: Aug–Nov (Post-monsoon)</div></div>
+        <span class="badge badge-r">Dengue</span>
+      </div>
+      <canvas id="dengueSeasonChart" height="180"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Malaria — Seasonal Average</div><div class="card-sub">Peak: Jun–Sep (Monsoon)</div></div>
+        <span class="badge badge-p">Malaria</span>
+      </div>
+      <canvas id="malariaSeasonChart" height="180"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Cholera — Seasonal Average</div><div class="card-sub">Peak: Mar–Jun (Summer)</div></div>
+        <span class="badge badge-y">Cholera</span>
+      </div>
+      <canvas id="choleraSeasonChart" height="180"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 3: CORRELATION                -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section" id="correlation">
+  <div class="section-head">
+    <div class="section-num">03</div>
+    <div class="section-title">Correlation & Lag Analysis</div>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Pearson Correlation — Dengue Predictors</div><div class="card-sub">Higher = stronger positive relationship</div></div>
+        <span class="badge badge-g">Pearson</span>
+      </div>
+      <canvas id="pearsonChart" height="220"></canvas>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Lag Analysis — Rainfall → Disease</div><div class="card-sub">At which lag does rainfall best predict disease?</div></div>
+        <span class="badge badge-y">Lag 0–4</span>
+      </div>
+      <div style="margin-bottom:16px">
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:10px">DENGUE (peak at lag 1)</div>
+        <div class="lag-grid">
+          <div class="lag-cell"><div class="lag-month">LAG 0</div><div class="lag-val" style="color:var(--muted2)">0.484</div></div>
+          <div class="lag-cell best"><div class="lag-month">LAG 1 ★</div><div class="lag-val">0.513</div></div>
+          <div class="lag-cell"><div class="lag-month">LAG 2</div><div class="lag-val" style="color:var(--muted2)">0.433</div></div>
+          <div class="lag-cell"><div class="lag-month">LAG 3</div><div class="lag-val" style="color:var(--muted2)">0.339</div></div>
+          <div class="lag-cell"><div class="lag-month">LAG 4</div><div class="lag-val" style="color:var(--muted2)">0.138</div></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:10px">MALARIA (peak at lag 0)</div>
+        <div class="lag-grid">
+          <div class="lag-cell best"><div class="lag-month">LAG 0 ★</div><div class="lag-val">0.420</div></div>
+          <div class="lag-cell"><div class="lag-month">LAG 1</div><div class="lag-val" style="color:var(--muted2)">0.316</div></div>
+          <div class="lag-cell"><div class="lag-month">LAG 2</div><div class="lag-val" style="color:var(--muted2)">0.140</div></div>
+          <div class="lag-cell"><div class="lag-month">LAG 3</div><div class="lag-val" style="color:var(--muted2)">−0.057</div></div>
+          <div class="lag-cell"><div class="lag-month">LAG 4</div><div class="lag-val" style="color:var(--muted2)">−0.257</div></div>
+        </div>
+      </div>
+      <div style="margin-top:16px;padding:12px 16px;background:rgba(0,255,163,0.05);border-radius:10px;border:1px solid rgba(0,255,163,0.15)">
+        <div style="font-size:12px;color:var(--g1);font-weight:600;margin-bottom:4px">📌 Key Finding</div>
+        <div style="font-size:12px;color:var(--muted)">Rainfall affects <b style="color:var(--text)">Dengue</b> with a <b style="color:var(--g1)">1-month biological lag</b> — matching mosquito breeding cycles. Malaria responds immediately (same month).</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 4: PCA                        -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section" id="pca">
+  <div class="section-head">
+    <div class="section-num">04</div>
+    <div class="section-title">Principal Component Analysis (PCA)</div>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Scree Plot — Explained Variance</div><div class="card-sub">5 components retain 95.49% of total information</div></div>
+        <span class="badge badge-b">9 Variables</span>
+      </div>
+      <canvas id="screeChart" height="220"></canvas>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Component Variance Table</div><div class="card-sub">Dimensionality reduction summary</div></div>
+        <span class="badge badge-g">95%+ Retained</span>
+      </div>
+      <table class="pca-table">
+        <thead>
+          <tr><th>Component</th><th>Variance %</th><th>Cumulative %</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="pca-highlight">PC1</td><td>52.51%</td><td>52.51%</td><td><span class="badge badge-g">Seasonal Climate</span></td></tr>
+          <tr><td class="pca-highlight">PC2</td><td>25.42%</td><td>77.93%</td><td><span class="badge badge-b">Disease Variation</span></td></tr>
+          <tr><td>PC3</td><td>8.19%</td><td>86.11%</td><td><span style="color:var(--muted);font-size:11px">Residual</span></td></tr>
+          <tr><td>PC4</td><td>6.22%</td><td>92.33%</td><td><span style="color:var(--muted);font-size:11px">Residual</span></td></tr>
+          <tr><td>PC5</td><td>3.16%</td><td class="pca-highlight">95.49% ✓</td><td><span class="badge badge-y">95% threshold</span></td></tr>
+          <tr><td style="color:var(--muted2)">PC6–PC9</td><td style="color:var(--muted2)">4.51%</td><td style="color:var(--muted2)">100%</td><td><span style="color:var(--muted2);font-size:11px">Noise</span></td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:16px;padding:12px 16px;background:rgba(0,212,255,0.05);border-radius:10px;border:1px solid rgba(0,212,255,0.15)">
+        <div style="font-size:12px;color:var(--g2);font-weight:600;margin-bottom:4px">📌 PCA Key Finding</div>
+        <div style="font-size:12px;color:var(--muted)"><b style="color:var(--text)">PC1 (52.5%)</b> is dominated by seasonal climate variables. <b style="color:var(--text)">PC2 (25.4%)</b> captures disease case variation. Just <b style="color:var(--g2)">5 components</b> out of 9 preserve 95%+ of all information — confirming strong climate-disease structure in the data.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 5: ML MODELS                  -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section" id="models">
+  <div class="section-head">
+    <div class="section-num">05</div>
+    <div class="section-title">Machine Learning Model Results</div>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Model Comparison</div><div class="card-sub">Trained on 134 months · tested on 34 months</div></div>
+        <span class="badge badge-g">3 Models</span>
+      </div>
+      <div class="model-row">
+        <div class="model-item winner">
+          <div class="model-name">🏆 Random Forest</div>
+          <div class="model-metrics">
+            <div class="metric-box">
+              <div class="metric-label">R² SCORE</div>
+              <div class="metric-val green">0.992</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-label">RMSE</div>
+              <div class="metric-val green">8.24</div>
+            </div>
+            <div class="model-bar-wrap">
+              <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-bottom:6px">ACCURACY</div>
+              <div class="model-bar-bg"><div class="model-bar" style="width:99.2%;background:linear-gradient(90deg,var(--g1),var(--g2))"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="model-item">
+          <div class="model-name" style="color:var(--g2)">XGBoost</div>
+          <div class="model-metrics">
+            <div class="metric-box">
+              <div class="metric-label">R² SCORE</div>
+              <div class="metric-val blue">0.990</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-label">RMSE</div>
+              <div class="metric-val blue">9.54</div>
+            </div>
+            <div class="model-bar-wrap">
+              <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-bottom:6px">ACCURACY</div>
+              <div class="model-bar-bg"><div class="model-bar" style="width:99%;background:linear-gradient(90deg,var(--g2),var(--p1))"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="model-item">
+          <div class="model-name" style="color:var(--y1)">Linear Regression</div>
+          <div class="model-metrics">
+            <div class="metric-box">
+              <div class="metric-label">R² SCORE</div>
+              <div class="metric-val yellow">0.866</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-label">RMSE</div>
+              <div class="metric-val yellow">34.46</div>
+            </div>
+            <div class="model-bar-wrap">
+              <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-bottom:6px">ACCURACY</div>
+              <div class="model-bar-bg"><div class="model-bar" style="width:86.6%;background:linear-gradient(90deg,var(--y1),var(--r1))"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:16px;padding:12px 16px;background:rgba(0,255,163,0.05);border-radius:10px;border:1px solid rgba(0,255,163,0.15)">
+        <div style="font-size:12px;color:var(--muted)">📌 ML (RF/XGB) outperforms traditional Linear Regression by <b style="color:var(--g1)">+14.5% R²</b> — validating the project's core hypothesis that non-linear ML models are essential for climate-disease analysis.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Feature Importance — Random Forest</div><div class="card-sub">What drives dengue predictions the most?</div></div>
+        <span class="badge badge-g">Top 10</span>
+      </div>
+      <div class="feat-list">
+        <div class="feat-item">
+          <div class="feat-top"><span class="feat-name">Month (sin encoding)</span><span class="feat-pct" style="color:var(--g1)">71.8%</span></div>
+          <div class="feat-bg"><div class="feat-fill" style="width:71.8%;background:linear-gradient(90deg,var(--g1),var(--g2))"></div></div>
+        </div>
+        <div class="feat-item">
+          <div class="feat-top"><span class="feat-name">Month (cos encoding)</span><span class="feat-pct" style="color:var(--g2)">20.1%</span></div>
+          <div class="feat-bg"><div class="feat-fill" style="width:20.1%;background:linear-gradient(90deg,var(--g2),var(--p1))"></div></div>
+        </div>
+        <div class="feat-item">
+          <div class="feat-top"><span class="feat-name">3-Month Avg Temperature</span><span class="feat-pct" style="color:var(--y1)">3.1%</span></div>
+          <div class="feat-bg"><div class="feat-fill" style="width:3.1%;background:var(--y1)"></div></div>
+        </div>
+        <div class="feat-item">
+          <div class="feat-top"><span class="feat-name">Humidity</span><span class="feat-pct" style="color:var(--r1)">1.9%</span></div>
+          <div class="feat-bg"><div class="feat-fill" style="width:1.9%;background:var(--r1)"></div></div>
+        </div>
+        <div class="feat-item">
+          <div class="feat-top"><span class="feat-name">Year Trend</span><span class="feat-pct" style="color:var(--p1)">0.9%</span></div>
+          <div class="feat-bg"><div class="feat-fill" style="width:0.9%;background:var(--p1)"></div></div>
+        </div>
+        <div class="feat-item">
+          <div class="feat-top"><span class="feat-name">Temperature</span><span class="feat-pct" style="color:var(--muted)">0.6%</span></div>
+          <div class="feat-bg"><div class="feat-fill" style="width:0.6%;background:var(--muted)"></div></div>
+        </div>
+        <div class="feat-item">
+          <div class="feat-top"><span class="feat-name">3-Month Avg Humidity</span><span class="feat-pct" style="color:var(--muted)">0.6%</span></div>
+          <div class="feat-bg"><div class="feat-fill" style="width:0.6%;background:var(--muted)"></div></div>
+        </div>
+        <div class="feat-item">
+          <div class="feat-top"><span class="feat-name">3-Month Avg Rainfall</span><span class="feat-pct" style="color:var(--muted)">0.4%</span></div>
+          <div class="feat-bg"><div class="feat-fill" style="width:0.4%;background:var(--muted)"></div></div>
+        </div>
+      </div>
+      <div style="margin-top:16px;padding:12px 16px;background:rgba(0,212,255,0.05);border-radius:10px;border:1px solid rgba(0,212,255,0.15)">
+        <div style="font-size:12px;color:var(--muted)">📌 <b style="color:var(--g2)">Seasonal encoding (91.9%)</b> is the strongest predictor — confirming disease is strongly seasonal. <b style="color:var(--text)">3-month temperature average</b> is the top individual climate variable.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 6: ARIMA                      -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section" id="arima">
+  <div class="section-head">
+    <div class="section-num">06</div>
+    <div class="section-title">ARIMA Time Series Forecasting</div>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">2024 Dengue Forecast — Month by Month</div><div class="card-sub">ARIMA(1,1,1) · trained on 2010–2023</div></div>
+        <span class="badge badge-r">Future Forecast</span>
+      </div>
+      <canvas id="arimaChart" height="220"></canvas>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Monthly Forecast Details</div><div class="card-sub">Predicted cases + risk classification</div></div>
+        <span class="badge badge-y">12 Months</span>
+      </div>
+      <table class="scenario-table">
+        <thead><tr><th>Month</th><th>Cases</th><th>Risk</th></tr></thead>
+        <tbody>
+          <tr><td>January 2024</td><td class="cases-num">62</td><td><span class="risk risk-low">Low</span></td></tr>
+          <tr><td>February 2024</td><td class="cases-num">74</td><td><span class="risk risk-low">Low</span></td></tr>
+          <tr><td>March 2024</td><td class="cases-num">82</td><td><span class="risk risk-mod">Moderate</span></td></tr>
+          <tr><td>April 2024</td><td class="cases-num">87</td><td><span class="risk risk-mod">Moderate</span></td></tr>
+          <tr><td>May 2024</td><td class="cases-num">90</td><td><span class="risk risk-mod">Moderate</span></td></tr>
+          <tr><td>June 2024</td><td class="cases-num">92</td><td><span class="risk risk-high">High</span></td></tr>
+          <tr><td>July 2024</td><td class="cases-num">93</td><td><span class="risk risk-high">High</span></td></tr>
+          <tr><td>August 2024</td><td class="cases-num">94</td><td><span class="risk risk-high">High</span></td></tr>
+          <tr><td>September 2024</td><td class="cases-num">94</td><td><span class="risk risk-high">High</span></td></tr>
+          <tr><td>October 2024</td><td class="cases-num">95</td><td><span class="risk risk-high">High</span></td></tr>
+          <tr><td>November 2024</td><td class="cases-num">95</td><td><span class="risk risk-high">High</span></td></tr>
+          <tr><td>December 2024</td><td class="cases-num">95</td><td><span class="risk risk-high">High</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 7: SCENARIOS                  -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section" id="scenarios">
+  <div class="section-head">
+    <div class="section-num">07</div>
+    <div class="section-title">Climate Scenario Predictions</div>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Scenario Risk Table</div><div class="card-sub">Random Forest predictions under future climate conditions</div></div>
+        <span class="badge badge-r">6 Scenarios</span>
+      </div>
+      <table class="scenario-table">
+        <thead><tr><th>Climate Scenario</th><th>Predicted Cases</th><th>Risk Level</th></tr></thead>
+        <tbody>
+          <tr><td>🟡 Normal (2024 baseline)</td><td class="cases-num">95</td><td><span class="risk risk-mod">Moderate</span></td></tr>
+          <tr><td>🔴 Hotter year (+1°C)</td><td class="cases-num">108</td><td><span class="risk risk-high">High</span></td></tr>
+          <tr><td>🔴 Drier year (−10% rain)</td><td class="cases-num">88</td><td><span class="risk risk-mod">Moderate</span></td></tr>
+          <tr><td>🟢 Wetter year (+10% rain)</td><td class="cases-num">102</td><td><span class="risk risk-high">High</span></td></tr>
+          <tr><td>🔴 Hot & Dry (worst case)</td><td class="cases-num">124</td><td><span class="risk risk-vhigh">Very High</span></td></tr>
+          <tr><td>🟢 Cool & Wet (best case)</td><td class="cases-num">78</td><td><span class="risk risk-low">Low</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Scenario Comparison Chart</div><div class="card-sub">Cases vary significantly across climate conditions</div></div>
+        <span class="badge badge-b">Comparative</span>
+      </div>
+      <canvas id="scenarioChart" height="220"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- KEY FINDINGS                          -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-head">
+    <div class="section-num">08</div>
+    <div class="section-title">Key Findings & Societal Impact</div>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="findings-row">
+    <div class="finding">
+      <div class="finding-icon">🌧️</div>
+      <div class="finding-title">1-Month Rainfall Lag on Dengue</div>
+      <div class="finding-text">Rainfall affects Dengue cases with a <b>1-month biological delay</b> (corr = 0.513) — matching real-world mosquito breeding cycles. This enables early warning systems.</div>
+    </div>
+    <div class="finding r">
+      <div class="finding-icon">🤖</div>
+      <div class="finding-title">Random Forest: 99.2% Accuracy</div>
+      <div class="finding-text">RF achieves <b>R² = 0.992</b> vs Linear Regression's 0.866 — proving ML captures non-linear climate-disease relationships that traditional models miss.</div>
+    </div>
+    <div class="finding y">
+      <div class="finding-icon">📅</div>
+      <div class="finding-title">Seasonality Drives Disease Most</div>
+      <div class="finding-text">Month encoding accounts for <b>91.9%</b> of feature importance — confirming disease is strongly seasonal, with monsoon and post-monsoon as peak risk periods.</div>
+    </div>
+    <div class="finding">
+      <div class="finding-icon">🧮</div>
+      <div class="finding-title">5 PCA Components Explain 95%</div>
+      <div class="finding-text">Dimensionality reduced from 9 variables to 5 components while retaining <b>95.49% of variance</b> — PC1 (52.5%) driven by seasonal climate patterns.</div>
+    </div>
+    <div class="finding r">
+      <div class="finding-icon">🌡️</div>
+      <div class="finding-title">Hot & Dry = Highest Risk</div>
+      <div class="finding-text">Scenario analysis shows a <b>Hot & Dry climate</b> produces the highest dengue case predictions (124 cases/month) — critical for public health planning.</div>
+    </div>
+    <div class="finding y">
+      <div class="finding-icon">🏥</div>
+      <div class="finding-title">Supports SDG 3 & SDG 13</div>
+      <div class="finding-text">The framework directly supports <b>Good Health & Wellbeing (SDG 3)</b> and <b>Climate Action (SDG 13)</b> by linking climate data to actionable disease insights.</div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <p><span class="footer-accent">Team 15</span> · Rachana P Shetty · Sanvi · Shreya · Vasushree K Rai</p>
+    <p>Guide: Dr. Mustafa Basthikodi · HOD, Dept. of CSE · Sahyadri CEM, Mangaluru</p>
+  </div>
+  <div style="text-align:right">
+    <p>Models: <span class="footer-accent">Random Forest (R²=0.992)</span> · XGBoost (R²=0.990) · Linear Regression (R²=0.866)</p>
+    <p>Data: NASA POWER API · Synthetic Disease Data · 168 monthly records · 2010–2023</p>
+  </div>
+</footer>
+
+</div><!-- /wrapper -->
+
+<script>
+const C = {
+  g1:'#00ffa3',g2:'#00d4ff',r1:'#ff4d6d',y1:'#ffbe0b',p1:'#7c5cbf',
+  muted:'#3d5068',bg:'#0f1829',border:'#1c2d45',text:'#dde8f5'
+};
+const baseOpts = {
+  responsive:true,
+  plugins:{legend:{labels:{color:C.muted,font:{family:'JetBrains Mono',size:11}}}},
+  scales:{
+    x:{ticks:{color:C.muted,font:{family:'JetBrains Mono',size:11}},grid:{color:'rgba(28,45,69,0.7)'}},
+    y:{ticks:{color:C.muted,font:{family:'JetBrains Mono',size:11}},grid:{color:'rgba(28,45,69,0.7)'}}
+  }
+};
+
+const months12=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// TEMP + HUMIDITY
+new Chart(document.getElementById('tempChart'),{
+  type:'line',
+  data:{
+    labels:months12,
+    datasets:[
+      {label:'Temperature (°C)',data:[22,24,27,28,27,25,24,23,23,23,22,21],
+       borderColor:C.r1,backgroundColor:'rgba(255,77,109,0.1)',borderWidth:2,
+       pointBackgroundColor:C.r1,pointRadius:4,tension:0.4,fill:true,yAxisID:'y'},
+      {label:'Humidity (%)',data:[58,56,58,65,75,82,85,87,86,82,75,65],
+       borderColor:C.g2,backgroundColor:'rgba(0,212,255,0.08)',borderWidth:2,
+       pointBackgroundColor:C.g2,pointRadius:4,tension:0.4,fill:true,yAxisID:'y1'}
+    ]
+  },
+  options:{...baseOpts,scales:{
+    x:baseOpts.scales.x,
+    y:{...baseOpts.scales.y,title:{display:true,text:'Temp (°C)',color:C.r1}},
+    y1:{position:'right',ticks:{color:C.g2,font:{family:'JetBrains Mono',size:11}},
+        grid:{drawOnChartArea:false},title:{display:true,text:'Humidity (%)',color:C.g2}}
+  }}
+});
+
+// RAINFALL
+new Chart(document.getElementById('rainfallChart'),{
+  type:'bar',
+  data:{
+    labels:months12,
+    datasets:[{
+      label:'Rainfall (mm)',
+      data:[2,1,3,8,18,85,120,95,65,35,12,4],
+      backgroundColor:'rgba(124,92,191,0.7)',borderRadius:6
+    }]
+  },
+  options:{...baseOpts}
+});
+
+// DISEASE TRENDS
+const diseaseLabels=[];
+for(let y=2010;y<=2023;y++) for(let m=0;m<12;m++) diseaseLabels.push(m===0?String(y):'');
+const dengue=[18,22,25,20,15,22,38,185,220,195,140,45,20,25,28,22,18,25,42,198,235,208,150,48,22,28,30,24,20,28,45,210,248,220,158,50,25,30,32,26,22,30,48,222,260,232,165,52,28,32,35,28,24,32,51,234,272,244,172,55,30,35,38,30,26,35,54,246,284,256,180,58,32,38,40,32,28,38,57,258,296,268,187,61,35,40,43,35,30,40,60,270,308,280,195,64,38,43,46,38,32,43,63,282,320,292,202,67,40,46,49,40,34,46,66,294,332,304,210,70,43,48,52,43,36,48,69,306,344,316,217,73,46,51,55,46,38,51,72,318,356,328,225,76,48,54,58,48,40,54,75,330,368,340,232,79,51,57,61,51,42,57,78,342,380,352,240,82];
+const malaria=[10,11,16,11,13,28,42,38,25,18,12,8,11,12,18,12,14,30,45,40,27,20,13,9,12,13,19,13,15,32,48,43,29,21,14,10,13,14,20,14,16,34,51,45,31,23,15,10,14,15,21,15,17,36,54,48,33,24,16,11,15,16,22,16,18,38,57,50,35,26,17,12,16,17,23,17,19,40,60,53,37,27,18,12,17,18,24,18,20,42,63,55,39,29,19,13,18,19,25,19,21,44,66,58,41,30,20,14,19,20,26,20,22,46,69,60,43,32,21,15,20,21,27,21,23,48,72,63,45,33,22,15,21,22,28,22,24,50,75,65,47,35,23,16,22,23,29,23,25,52,78,68,49,36,24,17,23,24,30,24,26,54,81,70,51,38,25,17];
+const cholera=[11,8,84,92,95,45,22,18,12,15,18,12,12,9,90,98,102,48,24,19,13,16,19,13,13,10,96,104,109,51,26,21,14,17,20,14,14,11,102,110,115,54,28,22,15,18,21,15,15,12,108,116,122,57,30,24,16,19,22,16,16,13,114,122,128,60,32,25,17,20,23,17,17,14,120,128,135,63,34,27,18,21,24,18,18,15,126,134,141,66,36,28,19,22,25,19,19,16,132,140,148,69,38,30,20,23,26,20,20,17,138,146,154,72,40,31,21,24,27,21,21,18,144,152,161,75,42,33,22,25,28,22,22,19,150,158,167,78,44,34,23,26,29,23,23,20,156,164,174,81,46,36,24,27,30,24,24,21,162,170,180,84,48,37,25,28,31,25];
+
+new Chart(document.getElementById('diseaseChart'),{
+  type:'line',
+  data:{
+    labels:diseaseLabels,
+    datasets:[
+      {label:'Dengue',data:dengue,borderColor:C.r1,borderWidth:1.5,pointRadius:0,tension:0.3,backgroundColor:'rgba(255,77,109,0.05)',fill:true},
+      {label:'Malaria',data:malaria,borderColor:C.p1,borderWidth:1.5,pointRadius:0,tension:0.3,backgroundColor:'rgba(124,92,191,0.05)',fill:true},
+      {label:'Cholera',data:cholera,borderColor:C.y1,borderWidth:1.5,pointRadius:0,tension:0.3,backgroundColor:'rgba(255,190,11,0.05)',fill:true}
+    ]
+  },
+  options:{...baseOpts}
+});
+
+// SEASONAL DISEASE CHARTS
+const dengueAvg=[19,23,27,23,18,28,50,220,258,228,162,50];
+const malariaAvg=[12,13,21,15,17,35,62,54,39,27,18,12];
+const choleraAvg=[13,10,120,115,120,54,30,22,16,20,23,15];
+
+['dengueSeasonChart','malariaSeasonChart','choleraSeasonChart'].forEach((id,i)=>{
+  const colors=[C.r1,C.p1,C.y1];
+  const data=[dengueAvg,malariaAvg,choleraAvg][i];
+  const labels=['Dengue Cases','Malaria Cases','Cholera Cases'];
+  new Chart(document.getElementById(id),{
+    type:'bar',
+    data:{labels:months12,datasets:[{label:labels[i],data,backgroundColor:colors[i]+'99',borderRadius:6}]},
+    options:{...baseOpts,plugins:{legend:{display:false}}}
+  });
+});
+
+// PEARSON CORRELATION
+new Chart(document.getElementById('pearsonChart'),{
+  type:'bar',
+  data:{
+    labels:['rainfall_3m_avg','humidity','rainfall','malaria_cases','temp_3m_avg','temperature','cholera_cases'],
+    datasets:[{
+      label:'Pearson r with Dengue',
+      data:[0.617,0.572,0.484,0.248,-0.209,-0.314,-0.479],
+      backgroundColor:ctx=>ctx.raw>=0?C.g1+'99':C.r1+'99',
+      borderRadius:6
+    }]
+  },
+  options:{
+    ...baseOpts,
+    indexAxis:'y',
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{...baseOpts.scales.x,min:-0.6,max:0.7},
+      y:{...baseOpts.scales.y,ticks:{color:C.text,font:{family:'JetBrains Mono',size:11}}}
+    }
+  }
+});
+
+// SCREE PLOT
+new Chart(document.getElementById('screeChart'),{
+  type:'bar',
+  data:{
+    labels:['PC1','PC2','PC3','PC4','PC5','PC6','PC7','PC8','PC9'],
+    datasets:[
+      {label:'Individual %',data:[52.51,25.42,8.19,6.22,3.16,2.37,1.32,0.68,0.14],
+       backgroundColor:[C.g1+'99',C.g2+'99',C.p1+'88',C.p1+'77',C.y1+'66',C.muted+'55',C.muted+'44',C.muted+'33',C.muted+'22'],
+       borderRadius:6,yAxisID:'y'},
+      {label:'Cumulative %',data:[52.51,77.93,86.11,92.33,95.49,97.86,99.18,99.86,100],
+       type:'line',borderColor:C.r1,borderWidth:2,pointBackgroundColor:C.r1,
+       pointRadius:5,tension:0.3,yAxisID:'y1'}
+    ]
+  },
+  options:{
+    ...baseOpts,
+    scales:{
+      x:baseOpts.scales.x,
+      y:{...baseOpts.scales.y,max:100},
+      y1:{position:'right',ticks:{color:C.r1,font:{family:'JetBrains Mono',size:11}},
+          grid:{drawOnChartArea:false},max:100}
+    }
+  }
+});
+
+// ARIMA FORECAST
+new Chart(document.getElementById('arimaChart'),{
+  type:'bar',
+  data:{
+    labels:months12,
+    datasets:[{
+      label:'Predicted Dengue Cases (2024)',
+      data:[62,74,82,87,90,92,93,94,94,95,95,95],
+      backgroundColor:m=>m.raw>90?C.r1+'cc':m.raw>80?C.y1+'cc':C.g1+'cc',
+      borderRadius:6
+    }]
+  },
+  options:{
+    ...baseOpts,
+    plugins:{legend:{display:false}},
+    scales:{
+      x:baseOpts.scales.x,
+      y:{...baseOpts.scales.y,min:0,max:120}
+    }
+  }
+});
+
+// SCENARIO CHART
+new Chart(document.getElementById('scenarioChart'),{
+  type:'bar',
+  data:{
+    labels:['Normal','Hotter +1°C','Drier -10%','Wetter +10%','Hot & Dry','Cool & Wet'],
+    datasets:[{
+      label:'Predicted Dengue Cases',
+      data:[95,108,88,102,124,78],
+      backgroundColor:[C.y1+'cc',C.r1+'cc',C.r1+'99',C.r1+'99',C.r1,C.g1+'cc'],
+      borderRadius:8
+    }]
+  },
+  options:{
+    ...baseOpts,
+    plugins:{
+      legend:{display:false},
+      tooltip:{callbacks:{label:ctx=>`${ctx.raw} cases/month`}}
+    }
+  }
+});
+
+// Nav active on scroll
+const sections=document.querySelectorAll('[id]');
+const navLinks=document.querySelectorAll('.nav-link');
+window.addEventListener('scroll',()=>{
+  let current='';
+  sections.forEach(s=>{if(window.scrollY>=s.offsetTop-100)current=s.id});
+  navLinks.forEach(l=>{
+    l.classList.remove('active');
+    if(l.getAttribute('href')==='#'+current)l.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
