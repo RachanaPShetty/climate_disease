@@ -50,30 +50,105 @@ st.sidebar.markdown("**Guide:** Dr. Mustafa Basthikodi")
 # PAGE 1 — OVERVIEW
 # ══════════════════════════════════════════════════════════════
 if page == "🏠 Overview":
-    st.title("🌡️ A Multidimensional ML Framework for Quantifying the Impact of Climatic Variability on General Disease Dynamics")
-    st.markdown("**Sahyadri College of Engineering & Management, Mangaluru | 2025-26**")
+
+    # 🔷 Header
+    st.markdown("""
+    <div style='background: linear-gradient(90deg, #2E86C1, #48C9B0);
+                padding: 25px; border-radius: 10px; color: white; text-align:center'>
+        <h1>🌍 Climate & Disease Intelligence Dashboard</h1>
+        <p style='font-size:18px;'>AI-powered analysis of climate impact on disease outbreaks</p>
+        <p>Sahyadri College of Engineering & Management | 2025–26</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # 👩‍💻 Team + Guide
+    col1, col2 = st.columns(2)
+    col1.info("👩‍💻 Team: Rachana | Sanvi | Shreya | Vasushree")
+    col2.success("🎓 Guide: Dr. Mustafa Basthikodi")
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # 🔢 KPIs
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("📅 Years", "2010–2023")
+    c2.metric("📊 Records", len(df))
+    c3.metric("🌡️ Avg Temp", f"{df['temperature'].mean():.1f}°C")
+    c4.metric("🦟 Dengue Cases", f"{df['dengue_cases'].sum():,}")
+
     st.markdown("---")
 
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("📅 Years Covered", "2010–2023")
-    col2.metric("📊 Total Records", len(df))
-    col3.metric("🌡️ Avg Temperature", f"{df['temperature'].mean():.1f} °C")
-    col4.metric("🦟 Total Dengue Cases", f"{df['dengue_cases'].sum():,}")
+    # 🧠 About
+    st.subheader("🧠 What this system does")
+
+    a1, a2, a3 = st.columns(3)
+
+    a1.markdown("""
+    <div style='background:#111827;padding:15px;border-radius:10px;color:white;'>
+    🌡️ <b>Climate Analysis</b><br>
+    Tracks temperature, rainfall & humidity patterns
+    </div>
+    """, unsafe_allow_html=True)
+
+    a2.markdown("""
+    <div style='background:#111827;padding:15px;border-radius:10px;color:white;'>
+    🦟 <b>Disease Tracking</b><br>
+    Studies Dengue, Malaria & Cholera trends
+    </div>
+    """, unsafe_allow_html=True)
+
+    a3.markdown("""
+    <div style='background:#111827;padding:15px;border-radius:10px;color:white;'>
+    🤖 <b>ML Prediction</b><br>
+    Uses Random Forest for outbreak prediction
+    </div>
+    """, unsafe_allow_html=True)
 
     st.markdown("---")
-    st.subheader("Project Summary")
-    st.info("""
-    This project analyses the complex relationship between **climate change** and **disease patterns**
-    using machine learning. By integrating climate variables (temperature, rainfall, humidity)
-    with disease occurrence data (Dengue, Malaria, Cholera), we uncover long-term trends
-    and correlations to support **public health planning** and **climate-health decision-making**.
-    """)
 
-    col1, col2, col3 = st.columns(3)
-    col1.success("✅ **Objective 1:** Data collection & organisation")
-    col2.success("✅ **Objective 2:** Climate-disease relationship framework")
-    col3.success("✅ **Objective 3:** ML model for trend identification")
-    st.success("✅ **Objective 4:** Reporting & visualisation module (this dashboard!)")
+    # 🔍 Insights
+    st.subheader("🔍 Key Insights")
+
+    i1, i2, i3 = st.columns(3)
+    i1.success("✔ Climate strongly impacts disease outbreaks")
+    i2.warning("⚠ Rainfall affects dengue with time lag")
+    i3.info("📊 ML model achieves high accuracy (R² ≈ 0.99)")
+
+    st.markdown("---")
+
+    # 🎯 Objectives (NOW INSIDE ✅)
+    st.subheader("🎯 Project Objectives")
+
+    o1, o2, o3, o4 = st.columns(4)
+
+    o1.markdown("""
+    <div style='background:#1f2937;padding:15px;border-radius:10px;text-align:center;color:white;'>
+    <h4>📊 Data Analysis</h4>
+    <p>Process and analyze climate & disease data</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    o2.markdown("""
+    <div style='background:#1f2937;padding:15px;border-radius:10px;text-align:center;color:white;'>
+    <h4>🔗 Relationship</h4>
+    <p>Identify climate–disease correlations</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    o3.markdown("""
+    <div style='background:#1f2937;padding:15px;border-radius:10px;text-align:center;color:white;'>
+    <h4>🤖 ML Model</h4>
+    <p>Predict outbreaks using machine learning</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    o4.markdown("""
+    <div style='background:#1f2937;padding:15px;border-radius:10px;text-align:center;color:white;'>
+    <h4>📈 Dashboard</h4>
+    <p>Interactive visualization & insights</p>
+    </div>
+    """, unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════
 # PAGE 2 — CLIMATE TRENDS
