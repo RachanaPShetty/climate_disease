@@ -117,39 +117,50 @@ if page == "🏠 Overview":
 
     st.markdown("---")
 
-    # 🎯 Objectives (NOW INSIDE ✅)
+    # 🎯 Objectives ✅ FIXED
     st.subheader("🎯 Project Objectives")
 
     o1, o2, o3, o4 = st.columns(4)
 
-    o1.markdown("""
-    <div style='background:#1f2937;padding:15px;border-radius:10px;text-align:center;color:white;'>
-    <h4>📊 Data Analysis</h4>
-    <p>Process and analyze climate & disease data</p>
+    card_style = """
+    background:#1f2937;
+    padding:20px;
+    border-radius:15px;
+    text-align:center;
+    color:white;
+    height:250px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    """
+
+    o1.markdown(f"""
+    <div style='{card_style}'>
+    <h3>📊 Data Analysis</h3>
+    <p>Process & analyze climate and disease data</p>
     </div>
     """, unsafe_allow_html=True)
 
-    o2.markdown("""
-    <div style='background:#1f2937;padding:15px;border-radius:10px;text-align:center;color:white;'>
-    <h4>🔗 Relationship</h4>
+    o2.markdown(f"""
+    <div style='{card_style}'>
+    <h3>🔗 Relationship</h3>
     <p>Identify climate–disease correlations</p>
     </div>
     """, unsafe_allow_html=True)
 
-    o3.markdown("""
-    <div style='background:#1f2937;padding:15px;border-radius:10px;text-align:center;color:white;'>
-    <h4>🤖 ML Model</h4>
+    o3.markdown(f"""
+    <div style='{card_style}'>
+    <h3>🤖 ML Model</h3>
     <p>Predict outbreaks using machine learning</p>
     </div>
     """, unsafe_allow_html=True)
 
-    o4.markdown("""
-    <div style='background:#1f2937;padding:15px;border-radius:10px;text-align:center;color:white;'>
-    <h4>📈 Dashboard</h4>
+    o4.markdown(f"""
+    <div style='{card_style}'>
+    <h3>📈 Dashboard</h3>
     <p>Interactive visualization & insights</p>
     </div>
     """, unsafe_allow_html=True)
-
 # ══════════════════════════════════════════════════════════════
 # PAGE 2 — CLIMATE TRENDS
 # ══════════════════════════════════════════════════════════════
