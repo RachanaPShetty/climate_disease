@@ -5,7 +5,8 @@ import seaborn as sns
 from scipy import stats
 
 # ── Load merged data ───────────────────────────────────────────
-df = pd.read_csv(r'C:\Users\HP\OneDrive\Desktop\6THSEM\MAJORPROJECT\climate_disease_project\data\processed\merged_data.csv')
+# NEW (correct)
+df = pd.read_csv(r'C:\Projects\ml_multidimensional_model\climate_disease\data\processed\merged_data.csv')
 
 print("Loaded data shape:", df.shape)
 print(df.head())
@@ -75,7 +76,7 @@ axes[1].set_xlabel('Lag (months)')
 axes[1].axhline(0, color='black', linewidth=0.5)
 
 plt.tight_layout()
-plt.savefig(r'C:\Users\HP\OneDrive\Desktop\6THSEM\MAJORPROJECT\climate_disease_project\reports\lag_analysis.png')
+plt.savefig(r'C:\Projects\ml_multidimensional_model\climate_disease\reports\lag_analysis.png')
 plt.show()
 print("\nLag analysis chart saved!")
 
@@ -108,7 +109,7 @@ sns.heatmap(spearman_corr, annot=True, fmt='.2f', cmap='coolwarm',
 axes[1].set_title('Spearman Correlation Matrix')
 
 plt.tight_layout()
-plt.savefig(r'C:\Users\HP\OneDrive\Desktop\6THSEM\MAJORPROJECT\climate_disease_project\reports\pearson_spearman.png')
+plt.savefig(r'C:\Projects\ml_multidimensional_model\climate_disease\reports\pearson_spearman.png')
 plt.show()
 print("Correlation heatmaps saved!")
 
@@ -116,7 +117,7 @@ print("Correlation heatmaps saved!")
 # STEP 4 — SAVE ENRICHED DATASET
 # ══════════════════════════════════════════════════════════════
 
-df.to_csv(r'C:\Users\HP\OneDrive\Desktop\6THSEM\MAJORPROJECT\climate_disease_project\data\processed\features_data.csv', index=False)
+df.to_csv(r'C:\Projects\ml_multidimensional_model\climate_disease\data\processed\features_data.csv', index=False)
 print("\nEnriched dataset saved to data/processed/features_data.csv ✅")
 print("Final dataset shape:", df.shape)
 print("Columns:", list(df.columns))

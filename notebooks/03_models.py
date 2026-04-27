@@ -10,7 +10,7 @@ from sklearn.preprocessing import StandardScaler
 import xgboost as xgb
 import pickle
 
-BASE = r'C:\Users\HP\OneDrive\Desktop\6THSEM\MAJORPROJECT\climate_disease_project'
+BASE = r'C:\Projects\ml_multidimensional_model\climate_disease'
 
 # ── Load enriched data ─────────────────────────────────────────
 df = pd.read_csv(f'{BASE}\\data\\processed\\features_data.csv')
